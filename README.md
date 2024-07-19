@@ -80,5 +80,8 @@ unit_region = cropped[40:60, 175:186]
 This section of code in main.py requires manual tuning to crop the frame until only the value and unit are in the frame as shown in the image below <br>
 ![cropped_frame.jpg](asset/cropped_frame.jpg) <br>
 
+The original frame before cropping <br>
+![original_frame.jpg](asset/sample_frame.jpg)
+
 ## Acknowledge
 [SSOCR](https://www.unix-ag.uni-kl.de/~auerswal/ssocr/)
