@@ -61,7 +61,7 @@ class SSOCR:
 
         return dst
 
-    def helper_extract(self, one_d_array, threshold=20):
+    def helper_extract(self, one_d_array, mode, threshold=20):
         res = []
         flag = 0
         temp = 0
@@ -72,6 +72,10 @@ class SSOCR:
                     end = i
                     temp = end
                     if end - start > 0:
+                        if mode == 'h':
+                            end = end + 1
+                        elif mode == 'v':
+                            end = end - 1
                         res.append((start, end))
                 flag = 0
             else:
@@ -82,16 +86,20 @@ class SSOCR:
                 start = temp
                 end = len(one_d_array)
                 if end - start > 0:
+                    if mode == 'h':
+                        end = end + 1
+                    elif mode == 'v':
+                        end = end - 1
                     res.append((start, end))
 
         return res
     
-    def find_digits_positions(self, img, reserved_threshold=0):
+    def find_digits_positions(self, img, reserved_threshold=10):
         digits_positions = []
         img_array = np.sum(img, axis=0)
-        horizon_position = self.helper_extract(img_array, threshold=reserved_threshold)
+        horizon_position = self.helper_extract(img_array, mode='h', threshold=reserved_threshold)
         img_array = np.sum(img, axis=1)
-        vertical_position = self.helper_extract(img_array, threshold=reserved_threshold * 4)
+        vertical_position = self.helper_extract(img_array, mode='v', threshold=reserved_threshold)
         
         # make vertical_position has only one element
         if len(vertical_position) > 1:
@@ -154,10 +162,10 @@ class SSOCR:
             digits.append(digit)
 
             # 小数点的识别
-            if cv2.countNonZero(roi[h - int(3 * width / 4):h, w - int(3 * width / 4):w]) / (9. / 16 * width * width) > 0.25:
+            if cv2.countNonZero(roi[h - int(4 * width / 4):h, w - int(4 * width / 4):w]) / (9. / 16 * width * width) > 0.5:
                 digits.append('.')
                 cv2.rectangle(output_img,
-                            (x0 + w - int(3 * width / 4), y0 + h - int(3 * width / 4)),
+                            (x0 + w - int(4 * width / 4), y0 + h - int(4 * width / 4)),
                             (x1, y1), (255, 0, 0), 1)
                 cv2.putText(output_img, 'dot',
                             (x0 + w - int(3 * width / 4), y0 + h - int(3 * width / 4) - 10),
