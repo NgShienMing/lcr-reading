@@ -9,9 +9,17 @@ video_path = 'asset/sample.mp4'
 
 # open the video file
 video = cv2.VideoCapture(video_path)
+
+# frame skipping
+fps = video.get(cv2.CAP_PROP_FPS)
+interval = 5 # seconds
+skip_frames = int(fps * interval)
+skip = False
+
 ssocr = SSOCR()
 capacitance = []
 units = []
+current_frame = 0
 
 while True:
     # read a frame from the video
@@ -23,6 +31,12 @@ while True:
 
     if show:
         cv2.imshow('Frame', frame)
+
+    if skip and current_frame < skip_frames:
+        current_frame += 1
+        continue
+
+    current_frame = 0
 
     cropped = frame[460:520, 185:380]
     number_region = cropped[:, 0:175]
