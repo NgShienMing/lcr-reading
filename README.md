@@ -1,5 +1,5 @@
-# SSOCR
-Seven Segment Optical Character Recognition
+# LCR meter reading
+Reading values of a LCR meter footage based on Seven Segment Optical Character Recognition created by jiweibo in this [repository](https://github.com/jiweibo/SSOCR.git)
 
 ## Algorithm
 ![solution](images/solution.png)
@@ -24,38 +24,61 @@ Digital recognition of seven-segment digital tube is relatively simple compared 
 
 Detect the existence of the corresponding bit, then encode the image, you can accurately identify the number.
 
-
-## Requirements
-* opencv
-* numpy
-* matplotlib
-
 ## Setup
+### Windows
 ```
-git clone https://github.com/jiweibo/SSOCR.git
-python ssocr.py images/test1.bmp -s
+git clone https://github.com/NgShienMing/lcr-reading.git
+
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install --upgrade pip
+pip install -r requirements.txt
 ```
 
 ## Results
-![test1.bmp](images/test1.bmp)
-![res1.bmp](images/res1.bmp)
-![test2.bmp](images/test2.bmp)
-![res2.bmp](images/res2.bmp)
-![test3.bmp](images/test3.bmp)
-![res3.bmp](images/res3.bmp)
-![test4.bmp](images/test4.bmp)
-![res4.bmp](images/res4.bmp)
+![0x601.jpg](asset/result/0x601.jpg)
+![591x6.jpg](asset/result/591x6.jpg) <br>
+![0x607.jpg](asset/result/0x607.jpg)
+![592x1.jpg](asset/result/592x1.jpg) <br>
+![0x612.jpg](asset/result/0x612.jpg)
+![592x6.jpg](asset/result/592x6.jpg) <br>
+![0x618.jpg](asset/result/0x618.jpg)
+![597x6.jpg](asset/result/597x6.jpg) <br>
 
 ```
-$ python ssocr.py images\test1.BMP
-['-', 3, 0, '.', 3, 7]
-$ python ssocr.py images\test2.BMP -s
-[1, 7, 7, '.', 7]
-$ python ssocr.py images\test3.BMP -s
-[0, 7, 8, '.', 3]
-$ python ssocr.py images\test4.BMP -s
-[0, 7, 2, '.', 6]
+python ssocr_module.py asset\test\test_0x601.jpg -s
+Number:  0.601
+
+python ssocr_module.py asset\test\test_0x607.jpg -s
+Number:  0.607
+
+python ssocr_module.py asset\test\test_0x612.jpg -s
+Number:  0.612
+
+python ssocr_module.py asset\test\test_0x618.jpg -s
+Number:  0.618
+
+python ssocr_module.py asset\test\test_591x6.jpg -s
+Number:  591.6
+
+python ssocr_module.py asset\test\test_592x1.jpg -s
+Number:  592.1
+
+python ssocr_module.py asset\test\test_592x6.jpg -s
+Number:  592.6
+
+python ssocr_module.py asset\test\test_597x6.jpg -s
+Number:  597.6
 ```
+
+## Notes
+```
+cropped = frame[460:520, 185:380]
+number_region = cropped[:, 0:175]
+unit_region = cropped[40:60, 175:186]
+```
+This section of code in main.py requires manual tuning to crop the frame until only the value and unit are in the frame as shown in the image below <br>
+![cropped_frame.jpg](asset/cropped_frame.jpg) <br>
 
 ## Acknowledge
 [SSOCR](https://www.unix-ag.uni-kl.de/~auerswal/ssocr/)
