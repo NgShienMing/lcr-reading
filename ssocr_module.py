@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 import argparse
 
 class SSOCR:
@@ -66,15 +65,17 @@ class SSOCR:
         flag = 0
         temp = 0
         for i in range(len(one_d_array)):
-            if one_d_array[i] < 10 * 255:
+            if one_d_array[i] < 10 * 200:
                 if flag > threshold:
                     start = i - flag
                     end = i
                     temp = end
-                    if end - start > 0:
-                        if mode == 'h':
-                            end = end + 1
-                        elif mode == 'v':
+                    if end - start > 10:
+                        # if mode == 'h':
+                        #     start = start - 1
+                        #     end = end + 1
+                        if mode == 'v':
+                            start = start - 1
                             end = end - 1
                         res.append((start, end))
                 flag = 0
@@ -85,16 +86,16 @@ class SSOCR:
             if flag > threshold:
                 start = temp
                 end = len(one_d_array)
-                if end - start > 0:
-                    if mode == 'h':
-                        end = end + 1
-                    elif mode == 'v':
-                        end = end - 1
+                if end - start > 10:
+                    # if mode == 'h':
+                    #     end = end + 1
+                    # elif mode == 'v':
+                    #     end = end - 1
                     res.append((start, end))
 
         return res
     
-    def find_digits_positions(self, img, reserved_threshold=10):
+    def find_digits_positions(self, img, reserved_threshold=0):
         digits_positions = []
         img_array = np.sum(img, axis=0)
         horizon_position = self.helper_extract(img_array, mode='h', threshold=reserved_threshold)
@@ -162,10 +163,10 @@ class SSOCR:
             digits.append(digit)
 
             # 小数点的识别
-            if cv2.countNonZero(roi[h - int(4 * width / 4):h, w - int(4 * width / 4):w]) / (9. / 16 * width * width) > 0.5:
+            if cv2.countNonZero(roi[h - int(3 * width / 4):h, w - int(4 * width / 4):w]) / (9. / 16 * width * width) > 0.25:
                 digits.append('.')
                 cv2.rectangle(output_img,
-                            (x0 + w - int(4 * width / 4), y0 + h - int(4 * width / 4)),
+                            (x0 + w - int(3 * width / 4), y0 + h - int(4 * width / 4)),
                             (x1, y1), (255, 0, 0), 1)
                 cv2.putText(output_img, 'dot',
                             (x0 + w - int(3 * width / 4), y0 + h - int(3 * width / 4) - 10),
@@ -177,13 +178,13 @@ class SSOCR:
         return digits
     
     def recognize_unit(self, binary_img):
-        # Find contours
+        # find contours
         contours, _ = cv2.findContours(binary_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        # Assume the largest contour is the letter
+        # assume the largest contour is the letter
         contour = max(contours, key=cv2.contourArea)
-        # Get bounding box
+        # get bounding box
         x, y, w, h = cv2.boundingRect(contour)
-        # Calculate aspect ratio
+        # calculate aspect ratio
         aspect_ratio = float(w) / h
 
         row_sum = np.sum(binary_img, axis=1)
