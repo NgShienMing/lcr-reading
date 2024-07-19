@@ -4,6 +4,7 @@ import pandas as pd
 from ssocr_module import SSOCR
 
 # path to the video file
+show = False
 video_path = 'asset/sample.mp4'
 
 # open the video file
@@ -19,6 +20,9 @@ while True:
     # if the frame was not successfully read, exit the loop
     if not ret:
         break
+
+    if show:
+        cv2.imshow('Frame', frame)
 
     cropped = frame[460:520, 185:380]
     number_region = cropped[:, 0:175]
