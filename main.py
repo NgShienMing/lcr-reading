@@ -4,8 +4,7 @@ import pandas as pd
 from ssocr_module import SSOCR
 
 # path to the video file
-show = False
-video_path = 'asset/sample.mp4'
+video_path = 'asset/experiment1_1_5.mp4'
 
 # open the video file
 video = cv2.VideoCapture(video_path)
@@ -19,38 +18,47 @@ skip = False
 ssocr = SSOCR()
 capacitance = []
 units = []
-current_frame = 0
+frame_counter = 0
+window_names = ['Cropped', 'Number', 'Unit', 'Result']
 
 while True:
     # read a frame from the video
     ret, frame = video.read()
+    frame_counter += 1
 
     # if the frame was not successfully read, exit the loop
     if not ret:
         break
 
-    if show:
-        cv2.imshow('Frame', frame)
-
-    if skip and current_frame < skip_frames:
-        current_frame += 1
+    if skip and frame_counter < skip_frames:
         continue
+    frame_counter = 0 # reset frame counter only if you want to skip for every interval
+    # no need to reset frame counter if you want to skip first t seconds only
+    # probably two counters are needed if you want to do both
 
-    current_frame = 0
+    # crop the frame to get the region of interest
+    cropped = frame[1070:1185, 540:882]
+    number_region = cropped[:, 0:300]
+    unit_region = cropped[82:, 300:328]
 
-    cropped = frame[460:520, 185:380]
-    number_region = cropped[:, 0:175]
-    unit_region = cropped[40:60, 175:186]
-
+    # run the SSOCR algorithm
     number, digit_img = ssocr.run_digit(number_region)
     unit = ssocr.run_unit(unit_region)
     unit = unit + 'F'
 
+    # append the capacitance and unit to the list
     capacitance.append(number)
     units.append(unit)
 
-    # cv2.imshow('Number', digit_img)
-    # cv2.waitKey(0)
+    # display the frames
+    to_display = [cropped, number_region, unit_region, digit_img]
+    assert len(to_display) == len(window_names) # make sure the number of images and window names are the same
+    for i in range(len(to_display)):
+        cv2.imshow(window_names[i], to_display[i])
+
+    # if the 'q' key is pressed, break from the loop
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
     print(f'{number} {unit}')
 
